@@ -47,7 +47,7 @@ def parse_args() -> CliArgs:
     )
 
     parser.add_argument(
-        "--read-entry",
+        "-r", "--read-entry",
         type=str,
         nargs="?",
         const="today",

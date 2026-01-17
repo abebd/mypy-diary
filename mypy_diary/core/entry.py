@@ -6,8 +6,8 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-from mypy_diary.types import StorageType, resolve_type_from_string
-from mypy_diary.core.editor import Editor
+from mypy_diary.core.types import StorageType, resolve_type_from_string
+from mypy_diary.editor import Editor
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,6 @@ def extract_title_from_content(content: str) -> tuple[str, str]:
         return title, ""
 
     for line in content.splitlines():
-
         is_whitespace = not line.strip()
 
         if not found_content:
@@ -58,14 +57,14 @@ class EntryHandler:
 
     def read_entry(self, entry_name):
         entry_found = False
+        extension = f"{self.config.settings['extension']}"
 
         if entry_name == "today":
             entry_name = self.entry_timestamp.strftime(
-                f"%Y-%m-%d.{self.config.settings['extension']}"
+                f"%Y-%m-%d.{extension}"
             )
 
         if self.type == StorageType.FILE:
-            extension = f"{self.config.settings['extension']}"
 
             # If extension was not sent from user
             # Might need an --override-extension parameter
@@ -139,7 +138,7 @@ class EntryHandler:
             pass
 
     def get_entry_from_editor(self):
-        editor = Editor(self.config)
+        editor = Editor(self.config.settings["editor"])
 
         if self.type == StorageType.FILE:
             with tempfile.NamedTemporaryFile(
@@ -156,8 +155,10 @@ class EntryHandler:
                 content = temp_path.read_text(encoding="utf-8")
 
                 title, message = extract_title_from_content(content)
+                
+                logger.debug(f"User wrote:\nTitle: {title}\nMessage: {message}")
 
-                if not message:
+                if message != "":
                     self.add_entry(title=title, message=message)
 
             finally:
@@ -170,8 +171,8 @@ class EntryHandler:
         if not file_path.exists():
             file_path.touch()
 
-        with open(file_path, "a") as f:
-            f.write(f"# {file_path.stem}\n\n")
+            with open(file_path, "a") as f:
+                f.write(f"# {file_path.stem}\n\n")
 
         logger.debug(str(self.diary_dir_path) + " does not exist, creating it")
 

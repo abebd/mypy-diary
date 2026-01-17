@@ -2,6 +2,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def setup_logging(verbose: bool):
     log_level = logging.DEBUG if verbose else logging.INFO
 
