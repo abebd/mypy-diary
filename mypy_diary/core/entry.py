@@ -74,7 +74,10 @@ class EntryHandler:
                     f"Appended {extension} to {entry_name} ({entry_name}.{extension})"
                 )
 
+            logger.debug(f"Found {str(len(self.entries))} file((s)")
+
             for entry in self.entries:
+                logger.debug(f"On entry: {entry}")
                 if (
                     entry_name == entry["name"]
                     or f"{entry_name}.{extension}" == entry["name"]

@@ -13,3 +13,5 @@ build/
 tags
 
 uv.lock
+
+mypy_diary/logs/
