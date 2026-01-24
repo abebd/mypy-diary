@@ -15,3 +15,7 @@ tags
 uv.lock
 
 enq/logs/
+
+todo
+diary.db
+config.toml

@@ -21,4 +21,4 @@ class Editor:
             subprocess.run([self.editor, str(file_path)], check=True)
             ui.reset_state()
         except subprocess.CalledProcessError as e:
-            wrint(f"Editor exited with an error: {e}")
+            print(f"Editor exited with an error: {e}")

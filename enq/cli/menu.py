@@ -1,4 +1,3 @@
-import questionary
 import logging
 
 from simple_term_menu import TerminalMenu
@@ -11,7 +10,7 @@ class MenuHandler():
         self.app = app
 
         self.menu_options = [
-            ("n", "Create a new entry", self.app.entry_handler.get_entry_from_editor),
+            ("n", "Create a new entry", self.app.entry_handler.create_entry_from_editor),
             ("r", "Read an entry", self.select_and_open_entry),
             (("q", "exit"), "Quit.", self._exit)
         ]

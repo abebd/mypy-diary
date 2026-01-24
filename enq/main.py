@@ -8,6 +8,8 @@ from enq.core.logger import setup_logging
 from enq.core.config import Config
 from enq.cli.menu import MenuHandler
 from enq.cli.interface import ui
+from enq.storage.database import DatabaseStorage
+from enq.storage.file import FileStorage
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +26,14 @@ class App():
     
         self.config = Config(self.args.config_file)
 
-        self.entry_handler = EntryHandler(self.config)
+        if self.config.settings["storage_mode"] == "database":
+            logger.debug("Using storage type database")
+            self.storage = DatabaseStorage(self.config)
+        else:
+            logger.debug("Using storage type file")
+            self.storage = FileStorage(self.config)
+
+        self.entry_handler = EntryHandler(self.config, self.storage)
         self.menu_handler = MenuHandler(self, self.config)
 
     def run(self):
@@ -45,7 +54,7 @@ class App():
 
         if self.args.new:
             ran_something = True
-            self.entry_handler.get_entry_from_editor()
+            self.entry_handler.create_entry_from_editor()
 
         # If nothing ran, open the interactive menu
         if not ran_something and not self.args.no_menu:
