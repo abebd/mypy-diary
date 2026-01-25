@@ -4,20 +4,26 @@ from simple_term_menu import TerminalMenu
 from enq.utils.cli import send_cls
 from enq.cli.interface import ui, State
 
-class MenuHandler():
+logger = logging.getLogger(__name__)
 
+
+class MenuHandler:
     def __init__(self, app, config):
         self.app = app
 
         self.menu_options = [
-            ("n", "Create a new entry", self.app.entry_handler.create_entry_from_editor),
-            ("r", "Read an entry", self.select_and_open_entry),
-            (("q", "exit"), "Quit.", self._exit)
+            (
+                "n",
+                "Create a new entry",
+                self.app.entry_handler.create_entry_from_editor,
+            ),
+            ("r", "Read an entry", self.app.entry_handler.select_and_open_entry),
+            (("q", "exit"), "Quit.", self._exit),
         ]
 
     def _send_header(self):
         send_cls()
-        
+
         for keys, label, _ in self.menu_options:
             display_key = keys[0] if isinstance(keys, tuple) else keys
             print(f"[{display_key}] {label}")
@@ -38,37 +44,22 @@ class MenuHandler():
                     found = True
                     break
 
-
             if not found:
                 self._send_header()
                 input("\nInvalid option. Enter a valid option. ")
-        
 
     def _exit(self):
         exit(0)
 
-    def select_and_open_entry(self):
-        # Keys currently is just the filename, and this is fine as a 
-        # key if we're just fetching entries from one folder.
-        # If we start fetching entries from multiple folders,
-        # we might need to provide the full path instead.
-        
-        entry_name =  run_interm_browser(
-            items=[item["name"] for item in self.app.entry_handler.entries], 
-            title="Select entry to view: ",
-        )
 
-        logging.debug(f"Chose entry: {entry_name}")
-        self.app.entry_handler.open_entry_in_editor(entry_name)
-    
-
-def run_interm_browser(items: tuple, title: str, ignore_help: bool = False): 
-
+def prompt_selection(items: tuple, title: str, ignore_help: bool = False):
     if not ignore_help:
         title += "\n(Press / and start typing to filter the list)"
-    
+
+    menu_display = [str(item) for item in items]
+
     terminal_menu = TerminalMenu(
-        [item for item in items],
+        menu_display,
         title=title,
         menu_cursor="> ",
         menu_cursor_style=("fg_cyan", "bold"),
@@ -77,7 +68,4 @@ def run_interm_browser(items: tuple, title: str, ignore_help: bool = False):
     selected_index = terminal_menu.show()
 
     if selected_index is not None:
-        selected_object = items[selected_index]
-
-        return selected_object
-
+        return items[selected_index]

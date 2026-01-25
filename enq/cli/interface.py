@@ -4,17 +4,19 @@ from enum import Enum, auto
 
 logger = logging.getLogger(__file__)
 
-class State(Enum): 
+
+class State(Enum):
     CLI = auto()
     MENU = auto()
     IN_EDITOR = auto()
+
 
 class Interface:
     def __init__(self):
         self._last_state = None
         self._state = State.CLI
         self._buffer = []
-        
+
     @property
     def state(self):
         return self._state
@@ -23,7 +25,7 @@ class Interface:
     def state(self, value: State):
         logger.debug(f"Setting state to: {value}")
         self._last_state = self._state
-        self._state = value 
+        self._state = value
 
     @property
     def buffer(self):
@@ -44,15 +46,20 @@ class Interface:
                 self._buffer.append(message)
 
             case State.CLI:
-                logger.debug(f"Printing message: '{message}'") #TODO: maybe unecessary idk
+                logger.debug(
+                    f"Printing message: '{message}'"
+                )  # TODO: maybe unecessary idk
                 print(message)
 
             case _:
-                raise ValueError(f"State {self.state} does not have a valid way of dealing with user messages.")
+                raise ValueError(
+                    f"State {self.state} does not have a valid way of dealing with user messages."
+                )
 
     def flush_buffer(self):
         content = "\n".join(self._buffer)
         self._buffer = []
         return content
+
 
 ui = Interface()

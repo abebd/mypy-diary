@@ -13,17 +13,17 @@ from enq.storage.file import FileStorage
 
 logger = logging.getLogger(__name__)
 
-class App():
 
+class App:
     def __init__(self):
         self.args = parse_args()
 
         setup_logging(self.args.verbose)
 
-        logger.debug(f"-----| Starting run @ enq-{get_version("enq")} |-----")
+        logger.debug(f"-----| Starting run @ enq-{get_version('enq')} |-----")
         logger.debug(f"Current state: {ui.state}")
         logger.debug(f"Args passed from user: {self.args}")
-    
+
         self.config = Config(self.args.config_file)
 
         if self.config.settings["storage_mode"] == "database":
@@ -39,25 +39,20 @@ class App():
     def run(self):
         ran_something = False
 
-        if self.args.list_entries:
+        if self.args.read_entries:
             ran_something = True
-            self.entry_handler.list_entries()
+            self.entry_handler.select_and_open_entry()
 
         if self.args.message:
             ran_something = True
-            self.entry_handler.add_entry(self.args.message, self.args.title)
-
-        if self.args.read_entry:
-            ran_something = True
-            #self.entry_handler.read_entry(self.args.read_entry)
-            self.entry_handler.open_entry_in_editor(self.args.read_entry)
+            self.entry_handler.create_entry_from_string(self.args.message)
 
         if self.args.new:
             ran_something = True
             self.entry_handler.create_entry_from_editor()
 
         # If nothing ran, open the interactive menu
-        if not ran_something and not self.args.no_menu:
+        if not ran_something:
             self.menu_handler.run()
 
 
